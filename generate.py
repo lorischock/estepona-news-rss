@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from feedgen.feed import FeedGenerator
 from urllib.parse import urljoin
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 
 BASE_URL = "https://ayuntamiento.estepona.es"
@@ -47,7 +47,7 @@ for article in articles:
     fe.link(href=full_url)
 
     # Add publication date (today, since site doesn't expose it cleanly)
-    fe.pubDate(datetime.utcnow())
+    fe.pubDate(datetime.now(timezone.utc))
 
     count += 1
     if count >= 10:
