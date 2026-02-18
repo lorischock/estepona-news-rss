@@ -19,7 +19,6 @@ fg.title("Ayuntamiento de Estepona - Noticias")
 fg.link(href=BASE_URL)
 fg.description("Últimas noticias del Ayuntamiento de Estepona")
 
-# Select only article links
 articles = soup.select('a[href^="/noticia/"]')
 
 seen = set()
@@ -39,15 +38,29 @@ for article in articles:
     if not raw_title:
         continue
 
-    # Remove leading date like 02/02/2026
+    # Remove leading date if present
     title = re.sub(r'^\d{2}/\d{2}/\d{4}', '', raw_title).strip()
+
+    # Fetch article page to extract real publication date
+    article_response = requests.get(full_url, headers=headers)
+    article_soup = BeautifulSoup(article_response.text, "html.parser")
+
+    date_tag = article_soup.select_one("#ContentNoticia_InfoBar li")
+
+    if date_tag:
+        date_text = date_tag.get_text(strip=True)
+        try:
+            pub_date = datetime.strptime(date_text, "%d %b %Y")
+            pub_date = pub_date.replace(tzinfo=timezone.utc)
+        except:
+            pub_date = datetime.now(timezone.utc)
+    else:
+        pub_date = datetime.now(timezone.utc)
 
     fe = fg.add_entry()
     fe.title(title)
     fe.link(href=full_url)
-
-    # Add publication date (today, since site doesn't expose it cleanly)
-    fe.pubDate(datetime.now(timezone.utc))
+    fe.pubDate(pub_date)
 
     count += 1
     if count >= 10:
