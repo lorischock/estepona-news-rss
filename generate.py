@@ -63,7 +63,7 @@ for article in articles:
     fe.pubDate(pub_date)
 
     count += 1
-    if count >= 10:
+    if count >= 20:
         break
 
 fg.rss_file("rss.xml")
