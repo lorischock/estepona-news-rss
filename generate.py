@@ -20,11 +20,6 @@ fg.title("Ayuntamiento de Estepona - Noticias")
 fg.link(href=BASE_URL)
 fg.description("Últimas noticias del Ayuntamiento de Estepona")
 
-fg.atom_link(
-    href="https://lorischock.github.io/estepona-news-rss/rss.xml",
-    rel="self"
-)
-
 articles = soup.select('a[href^="/noticia/"]')
 
 seen = set()
@@ -62,7 +57,7 @@ max_id = max(a[0] for a in article_data)
 # Sort newest first
 article_data.sort(reverse=True)
 
-# Generate feed entries
+# Generate feed entries (TESTING MODE = 1 item)
 for article_id, title, full_url in article_data[:1]:
     pub_date = datetime.now(timezone.utc) - timedelta(minutes=(max_id - article_id))
 
