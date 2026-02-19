@@ -52,17 +52,17 @@ for article in articles:
     if date_tag:
         full_text = date_tag.get_text(strip=True)
     
-        # Extract something like: Feb 18, 2026 at 6:00 PM
-        match = re.search(r"[A-Za-z]{3} \d{1,2}, \d{4} at \d{1,2}:\d{2} [AP]M", full_text)
+        # Extract only the date part after the "/"
+        # Example:
+        # "Ayuntamiento de Estepona - Noticias / Feb 18, 2026 at 6:00 PM"
+        # We split and take the last part
+        date_text = full_text.split("/")[-1].strip()
     
-        if match:
-            date_text = match.group(0)
-            try:
-                pub_date = datetime.strptime(date_text, "%b %d, %Y at %I:%M %p")
-                pub_date = pub_date.replace(tzinfo=timezone.utc)
-            except:
-                pub_date = datetime.now(timezone.utc)
-        else:
+        try:
+            pub_date = datetime.strptime(date_text, "%b %d, %Y at %I:%M %p")
+            pub_date = pub_date.replace(tzinfo=timezone.utc)
+        except Exception as e:
+            print("Date parse failed:", date_text)
             pub_date = datetime.now(timezone.utc)
     else:
         pub_date = datetime.now(timezone.utc)
