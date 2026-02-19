@@ -20,6 +20,11 @@ fg.title("Ayuntamiento de Estepona - Noticias")
 fg.link(href=BASE_URL)
 fg.description("Últimas noticias del Ayuntamiento de Estepona")
 
+fg.atom_link(
+    href="https://lorischock.github.io/estepona-news-rss/rss.xml",
+    rel="self"
+)
+
 articles = soup.select('a[href^="/noticia/"]')
 
 seen = set()
