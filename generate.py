@@ -47,19 +47,22 @@ for article in articles:
 
     date_tag = article_soup.select_one("#ContentNoticia_InfoBar li")
 
+    date_tag = article_soup.select_one("#ContentNoticia_InfoBar li")
+
     if date_tag:
         full_text = date_tag.get_text(strip=True)
-
-        # Extract only the date portion after the "/"
-        if "/" in full_text:
-            date_text = full_text.split("/")[-1].strip()
+    
+        # Extract something like: Feb 18, 2026 at 6:00 PM
+        match = re.search(r"[A-Za-z]{3} \d{1,2}, \d{4} at \d{1,2}:\d{2} [AP]M", full_text)
+    
+        if match:
+            date_text = match.group(0)
+            try:
+                pub_date = datetime.strptime(date_text, "%b %d, %Y at %I:%M %p")
+                pub_date = pub_date.replace(tzinfo=timezone.utc)
+            except:
+                pub_date = datetime.now(timezone.utc)
         else:
-            date_text = full_text.strip()
-
-        try:
-            pub_date = datetime.strptime(date_text, "%b %d, %Y at %I:%M %p")
-            pub_date = pub_date.replace(tzinfo=timezone.utc)
-        except:
             pub_date = datetime.now(timezone.utc)
     else:
         pub_date = datetime.now(timezone.utc)
