@@ -38,7 +38,7 @@ for article in articles:
     if not raw_title:
         continue
 
-    # Remove leading date if present
+    # Remove leading date if present in title
     title = re.sub(r'^\d{2}/\d{2}/\d{4}', '', raw_title).strip()
 
     # Fetch article page to extract real publication date
@@ -48,7 +48,14 @@ for article in articles:
     date_tag = article_soup.select_one("#ContentNoticia_InfoBar li")
 
     if date_tag:
-        date_text = date_tag.get_text(strip=True)
+        full_text = date_tag.get_text(strip=True)
+
+        # Extract only the date portion after the "/"
+        if "/" in full_text:
+            date_text = full_text.split("/")[-1].strip()
+        else:
+            date_text = full_text.strip()
+
         try:
             pub_date = datetime.strptime(date_text, "%b %d, %Y at %I:%M %p")
             pub_date = pub_date.replace(tzinfo=timezone.utc)
