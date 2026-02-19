@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from feedgen.feed import FeedGenerator
 from urllib.parse import urljoin
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import re
 
 BASE_URL = "https://ayuntamiento.estepona.es"
@@ -38,36 +38,24 @@ for article in articles:
     if not raw_title:
         continue
 
-    title = re.sub(r'^\d{2}/\d{2}/\d{4}', '', raw_title).strip()
+    title = raw_title.strip()
 
-    # Fetch article page
-    article_response = requests.get(full_url, headers=headers)
-    article_soup = BeautifulSoup(article_response.text, "html.parser")
-
-    pub_date = None
-
-    # Grab all list items in info bar
-    info_items = article_soup.select("#ContentNoticia_InfoBar li")
-
-    for item in info_items:
-        text = item.get_text(strip=True)
-
-        # Look for English format like: Feb 18, 2026 at 6:00 PM
-        match = re.search(r'[A-Za-z]{3} \d{1,2}, \d{4} at \d{1,2}:\d{2} [AP]M', text)
-        if match:
-            date_text = match.group(0)
-            pub_date = datetime.strptime(date_text, "%b %d, %Y at %I:%M %p")
-            pub_date = pub_date.replace(tzinfo=timezone.utc)
-            break
-
-    # If no valid date found, skip this entry
-    if not pub_date:
+    # Extract numeric article ID
+    match = re.search(r'/noticia/(\d+)', href)
+    if not match:
         continue
+
+    article_id = int(match.group(1))
+
+    # Create stable pseudo-date based on article ID
+    base_date = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    pub_date = base_date + timedelta(minutes=article_id)
 
     fe = fg.add_entry()
     fe.title(title)
     fe.link(href=full_url)
     fe.pubDate(pub_date)
+    fe.guid(full_url, permalink=True)
 
     count += 1
     if count >= 20:
