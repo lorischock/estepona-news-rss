@@ -47,8 +47,6 @@ for article in articles:
 
     date_tag = article_soup.select_one("#ContentNoticia_InfoBar li")
 
-    date_tag = article_soup.select_one("#ContentNoticia_InfoBar li")
-
     if date_tag:
         full_text = date_tag.get_text(strip=True)
     
