@@ -50,7 +50,7 @@ for article in articles:
     if date_tag:
         date_text = date_tag.get_text(strip=True)
         try:
-            pub_date = datetime.strptime(date_text, "%d %b %Y")
+            pub_date = datetime.strptime(date_text, "%b %d, %Y at %I:%M %p")
             pub_date = pub_date.replace(tzinfo=timezone.utc)
         except:
             pub_date = datetime.now(timezone.utc)
