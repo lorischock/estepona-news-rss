@@ -58,7 +58,7 @@ max_id = max(a[0] for a in article_data)
 article_data.sort(reverse=True)
 
 # Generate feed entries (TESTING MODE = 1 item)
-for article_id, title, full_url in article_data[:1]:
+for article_id, title, full_url in article_data[:20]:
     pub_date = datetime.now(timezone.utc) - timedelta(minutes=(max_id - article_id))
 
     fe = fg.add_entry()
